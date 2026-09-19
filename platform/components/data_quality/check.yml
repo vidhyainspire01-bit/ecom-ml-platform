@@ -1,0 +1,36 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: data_quality_check
+display_name: Data Quality Check
+description: >-
+  SHARED, model-agnostic gate. Validates schema, null rate, and row
+  count BEFORE any training compute is spent. Passes the input through
+  unchanged on success -- preprocess_step reads its output, not the
+  raw input directly, so a failure here genuinely blocks the pipeline.
+version: 1
+type: command
+inputs:
+  raw_data:
+    type: uri_folder
+  features:
+    type: string
+  target_column:
+    type: string
+  max_null_rate:
+    type: number
+    default: 0.05
+  min_row_count:
+    type: integer
+    default: 50
+outputs:
+  validated_data:
+    type: uri_folder
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python check.py
+  --raw_data ${{inputs.raw_data}}
+  --features "${{inputs.features}}"
+  --target_column ${{inputs.target_column}}
+  --max_null_rate ${{inputs.max_null_rate}}
+  --min_row_count ${{inputs.min_row_count}}
+  --validated_data ${{outputs.validated_data}}
