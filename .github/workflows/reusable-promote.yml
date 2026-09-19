@@ -30,16 +30,27 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - run: az extension add -n ml -y
+      - run: az configure --defaults group=ecom-mlops-rg workspace=ecom-mlops-ws
       - uses: actions/setup-python@v5
         with: { python-version: "3.10" }
-      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml
+      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml azure-ai-ml azure-identity
       - name: Point MLflow at the Azure ML workspace
         run: |
           echo "MLFLOW_TRACKING_URI=$(az ml workspace show --query mlflow_tracking_uri -o tsv)" >> $GITHUB_ENV
       - name: Download the platform's held-out validation set
-        run: az ml data download --name churn-validation-set --version 1 --download-path validation_data/
+        run: |
+          python mlops/scripts/download_data_asset.py \
+            --subscription_id "${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+            --resource_group ecom-mlops-rg \
+            --workspace_name ecom-mlops-ws \
+            --name churn-validation-set \
+            --version 1 \
+            --download_path validation_data/
+      - name: Show what actually got downloaded
+        run: find validation_data -type f
       - run: |
           python mlops/validate_and_promote.py \
             --model_name "${{ inputs.model_name }}" \
-            --validation_data validation_data/validation.csv \
+            --validation_data "$(find validation_data -name '*.csv' | head -1)" \
             --target_stage "${{ inputs.target_stage }}"
