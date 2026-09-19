@@ -1,9 +1,7 @@
-# triggering first automated run
-
 model_name: churn_model
-mlflow_run_id: a511a7f0-2bb8-4d73-8c07-1ccd39dcdee1
+mlflow_run_id: b8dfb01f-d2f3-4192-a014-17ed954864f1
 registered_model_name: ecom-churn_model
-registered_model_version: '2'
+registered_model_version: '4'
 features: order_count,avg_order_value,days_since_signup
 target_column: churned
 model_type: classifier
