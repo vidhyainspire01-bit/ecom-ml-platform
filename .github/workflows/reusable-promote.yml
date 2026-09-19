@@ -34,19 +34,19 @@ jobs:
       - run: az configure --defaults group=ecom-mlops-rg workspace=ecom-mlops-ws
       - uses: actions/setup-python@v5
         with: { python-version: "3.10" }
-      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml "azure-ai-ml==1.20.0" azure-identity     
+      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml
       - name: Point MLflow at the Azure ML workspace
         run: |
           echo "MLFLOW_TRACKING_URI=$(az ml workspace show --query mlflow_tracking_uri -o tsv)" >> $GITHUB_ENV
       - name: Download the platform's held-out validation set
         run: |
-          python mlops/scripts/download_data_asset.py \
-            --subscription_id "${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
-            --resource_group ecom-mlops-rg \
-            --workspace_name ecom-mlops-ws \
-            --name churn-validation-set \
-            --version 1 \
-            --download_path validation_data/
+          mkdir -p validation_data
+          az storage blob download \
+            --account-name ecommlopstorageaaf1d8da7 \
+            --container-name azureml-blobstore-fd2efc89-0d50-4333-801f-e697c5bdd4b7 \
+            --name "LocalUpload/d92ae18288f41c0b1b9579b2f2ac9eda539913e6b6e51df8373716e4480735af/validation_data/validation.csv" \
+            --file validation_data/validation.csv \
+            --auth-mode login
       - name: Show what actually got downloaded
         run: find validation_data -type f
       - run: |
