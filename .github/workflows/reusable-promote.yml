@@ -34,7 +34,7 @@ jobs:
       - run: az configure --defaults group=ecom-mlops-rg workspace=ecom-mlops-ws
       - uses: actions/setup-python@v5
         with: { python-version: "3.10" }
-      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml
+      - run: pip install "mlflow==2.14.1" "mlflow-skinny==2.14.1" "azureml-mlflow==1.57.0" scikit-learn pandas pyyaml
       - name: Point MLflow at the Azure ML workspace
         run: |
           echo "MLFLOW_TRACKING_URI=$(az ml workspace show --query mlflow_tracking_uri -o tsv)" >> $GITHUB_ENV
