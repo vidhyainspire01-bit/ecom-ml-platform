@@ -1,3 +1,5 @@
+# triggering first automated run
+
 model_name: churn_model
 mlflow_run_id: a511a7f0-2bb8-4d73-8c07-1ccd39dcdee1
 registered_model_name: ecom-churn_model
