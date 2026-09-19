@@ -18,6 +18,9 @@ on:
 
 jobs:
   call-reusable-promote:
+    permissions:
+      id-token: write
+      contents: read
     uses: ./.github/workflows/reusable-promote.yml
     with:
       model_name: churn_model
