@@ -6,7 +6,7 @@ name: train-churn-model
 on:
   push:
     paths:
-      - "mlops/models/churn_model/**"
+      - "mlops/models/churn_model/config.yaml"
       - "platform/components/**"
       - "mlops/pipelines/train_pipeline.yml"
     branches: [main]

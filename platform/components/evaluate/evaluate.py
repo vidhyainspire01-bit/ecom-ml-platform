@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import math
 import pandas as pd
 import mlflow.sklearn
 from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, roc_auc_score
@@ -10,8 +11,22 @@ METRIC_FNS = {
     "accuracy": accuracy_score,
     "f1": f1_score,
     "roc_auc": roc_auc_score,
-    "rmse": lambda y_true, y_pred: mean_squared_error(y_true, y_pred, squared=False),
+    "rmse": lambda y_true, y_pred: math.sqrt(mean_squared_error(y_true, y_pred)),
 }
+
+
+def score_and_gate(y_true, y_pred, metric_name: str, min_threshold: float) -> dict:
+    """Pure logic, no file I/O, no model loading -- this is what
+    tests/test_evaluate.py actually exercises."""
+    metric_fn = METRIC_FNS[metric_name]
+    score = float(metric_fn(y_true, y_pred))
+    passed = score >= min_threshold if metric_name != "rmse" else score <= min_threshold
+    return {
+        "metric_name": metric_name,
+        "score": score,
+        "min_threshold": min_threshold,
+        "passed": passed,
+    }
 
 
 def main():
@@ -35,17 +50,9 @@ def main():
     else:
         y_pred = model.predict(X)
 
-    metric_fn = METRIC_FNS[args.metric_name]
-    score = float(metric_fn(y_true, y_pred))
-
-    passed = score >= args.min_threshold if args.metric_name != "rmse" else score <= args.min_threshold
-
-    result = {
-        "metric_name": args.metric_name,
-        "score": score,
-        "min_threshold": args.min_threshold,
-        "passed": passed,
-    }
+    result = score_and_gate(y_true, y_pred, args.metric_name, args.min_threshold)
+    passed = result["passed"]
+    score = result["score"]
 
     os.makedirs(os.path.dirname(args.metrics_output), exist_ok=True)
     with open(args.metrics_output, "w") as f:
