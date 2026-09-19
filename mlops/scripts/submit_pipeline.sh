@@ -29,6 +29,8 @@ MIN_THRESHOLD=$(read_field min_threshold)
 
 az ml job create \
   -f mlops/pipelines/train_pipeline.yml \
+  --resource-group ecom-mlops-rg \
+  --workspace-name ecom-mlops-ws \
   --set inputs.raw_data.path="${RAW_DATA_PATH}" \
   --set inputs.features="${FEATURES}" \
   --set inputs.target_column="${TARGET_COLUMN}" \
