@@ -28,6 +28,13 @@ def main():
         args.workspace_name,
     )
 
+    if not hasattr(ml_client.data, "download"):
+        available = [m for m in dir(ml_client.data) if not m.startswith("_")]
+        raise AttributeError(
+            f"ml_client.data has no 'download' method in this azure-ai-ml version. "
+            f"Available methods: {available}"
+        )
+
     ml_client.data.download(name=args.name, version=args.version, download_path=args.download_path)
     print(f"Downloaded {args.name}:{args.version} -> {args.download_path}")
 

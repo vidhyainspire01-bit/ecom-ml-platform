@@ -34,8 +34,7 @@ jobs:
       - run: az configure --defaults group=ecom-mlops-rg workspace=ecom-mlops-ws
       - uses: actions/setup-python@v5
         with: { python-version: "3.10" }
-      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml azure-ai-ml azure-identity
-      - name: Point MLflow at the Azure ML workspace
+      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml "azure-ai-ml==1.20.0" azure-identity      - name: Point MLflow at the Azure ML workspace
         run: |
           echo "MLFLOW_TRACKING_URI=$(az ml workspace show --query mlflow_tracking_uri -o tsv)" >> $GITHUB_ENV
       - name: Download the platform's held-out validation set
