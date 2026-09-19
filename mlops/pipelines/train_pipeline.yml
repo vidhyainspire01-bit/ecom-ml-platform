@@ -25,11 +25,19 @@ settings:
   force_rerun: true
 
 jobs:
+  data_quality_step:
+    type: command
+    component: ../../platform/components/data_quality/check.yml
+    inputs:
+      raw_data: ${{parent.inputs.raw_data}}
+      features: ${{parent.inputs.features}}
+      target_column: ${{parent.inputs.target_column}}
+
   preprocess_step:
     type: command
     component: ../../platform/components/preprocess/preprocess.yml
     inputs:
-      input_data: ${{parent.inputs.raw_data}}
+      input_data: ${{parent.jobs.data_quality_step.outputs.validated_data}}
       features: ${{parent.inputs.features}}
       target_column: ${{parent.inputs.target_column}}
 
