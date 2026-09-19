@@ -1,0 +1,63 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+display_name: onboarding-pipeline
+description: >-
+  Model-agnostic train/evaluate/register pipeline. Every input below is
+  supplied at submission time from a model's config.yml — this file
+  itself never changes when a new model is onboarded.
+
+inputs:
+  raw_data:
+    type: uri_folder
+    path: azureml:churn-raw-data@latest
+  features: "recency_days,order_count,avg_order_value,days_since_signup"
+  target_column: "churned"
+  model_type: "classifier"
+  hyperparameters: '{"n_estimators": 200, "max_depth": 6}'
+  metric_name: "accuracy"
+  min_threshold: 0.75
+  model_name: "churn_model"
+  git_sha: "placeholder"
+  data_version: "placeholder"
+
+settings:
+  default_compute: azureml:cpu-cluster
+  force_rerun: true
+
+jobs:
+  preprocess_step:
+    type: command
+    component: ../../platform/components/preprocess/preprocess.yml
+    inputs:
+      input_data: ${{parent.inputs.raw_data}}
+      features: ${{parent.inputs.features}}
+      target_column: ${{parent.inputs.target_column}}
+
+  train_step:
+    type: command
+    component: ../../platform/components/train/train.yml
+    inputs:
+      clean_data: ${{parent.jobs.preprocess_step.outputs.clean_data}}
+      target_column: ${{parent.inputs.target_column}}
+      model_type: ${{parent.inputs.model_type}}
+      hyperparameters: ${{parent.inputs.hyperparameters}}
+
+  evaluate_step:
+    type: command
+    component: ../../platform/components/evaluate/evaluate.yml
+    inputs:
+      model_input: ${{parent.jobs.train_step.outputs.model_output}}
+      clean_data: ${{parent.jobs.preprocess_step.outputs.clean_data}}
+      target_column: ${{parent.inputs.target_column}}
+      metric_name: ${{parent.inputs.metric_name}}
+      min_threshold: ${{parent.inputs.min_threshold}}
+
+  register_step:
+    type: command
+    component: ../../platform/components/register/register.yml
+    inputs:
+      model_input: ${{parent.jobs.train_step.outputs.model_output}}
+      metrics_input: ${{parent.jobs.evaluate_step.outputs.metrics_output}}
+      model_name: ${{parent.inputs.model_name}}
+      git_sha: ${{parent.inputs.git_sha}}
+      data_version: ${{parent.inputs.data_version}}

@@ -1,0 +1,26 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: churn_model_build_features
+display_name: Build Churn Features (Silver -> Gold)
+description: >-
+  MODEL-SPECIFIC. RFM aggregation and churn label definition for the
+  churn model only. Lives under models/churn_model/, not data_platform/,
+  because a different model (e.g. a recommender) would need entirely
+  different feature logic from the same curated_orders input.
+version: 1
+type: command
+inputs:
+  curated_orders:
+    type: uri_folder
+  churn_window_days:
+    type: integer
+    default: 90
+outputs:
+  churn_features:
+    type: uri_folder
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python build_features.py
+  --curated_orders ${{inputs.curated_orders}}
+  --churn_window_days ${{inputs.churn_window_days}}
+  --churn_features ${{outputs.churn_features}}

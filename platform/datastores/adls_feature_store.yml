@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/azureDataLakeGen2.schema.json
+name: adls_feature_store
+type: azure_data_lake_gen2
+description: Gold layer — named, versioned, model-scoped feature tables. e.g. churn/customer_rfm_v1/. Written by platform/feature_components/<model>/.
+account_name: ecomadlsgen2vt01
+filesystem: feature-store

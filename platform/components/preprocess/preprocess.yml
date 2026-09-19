@@ -1,0 +1,27 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: preprocess_data
+display_name: Preprocess Data
+description: >-
+  Model-agnostic cleaning step. Takes a raw tabular data folder plus a
+  feature list and target column supplied by the calling model's config —
+  it never hardcodes column names for any specific model.
+version: 1
+type: command
+inputs:
+  input_data:
+    type: uri_folder
+  features:
+    type: string          # comma-separated column names, e.g. "recency,frequency,monetary"
+  target_column:
+    type: string
+outputs:
+  clean_data:
+    type: uri_folder
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python preprocess.py
+  --input_data ${{inputs.input_data}}
+  --features "${{inputs.features}}"
+  --target_column ${{inputs.target_column}}
+  --clean_data ${{outputs.clean_data}}

@@ -1,0 +1,45 @@
+name: reusable-promote
+# FLOW 1 — DS handoff promotion. NO training happens here. Loads the
+# model DS already registered, re-scores it independently, re-tags
+# the stage if it passes. This is the workflow that was missing.
+
+on:
+  workflow_call:
+    inputs:
+      model_name:
+        required: true
+        type: string
+      target_stage:
+        required: true
+        type: string
+    secrets:
+      AZURE_CLIENT_ID: { required: true }
+      AZURE_TENANT_ID: { required: true }
+      AZURE_SUBSCRIPTION_ID: { required: true }
+
+jobs:
+  validate-and-promote:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.10" }
+      - run: pip install mlflow azureml-mlflow scikit-learn pandas pyyaml
+      - name: Point MLflow at the Azure ML workspace
+        run: |
+          echo "MLFLOW_TRACKING_URI=$(az ml workspace show --query mlflow_tracking_uri -o tsv)" >> $GITHUB_ENV
+      - name: Download the platform's held-out validation set
+        run: az ml data download --name churn-validation-set --version 1 --download-path validation_data/
+      - run: |
+          python mlops/validate_and_promote.py \
+            --model_name "${{ inputs.model_name }}" \
+            --validation_data validation_data/validation.csv \
+            --target_stage "${{ inputs.target_stage }}"

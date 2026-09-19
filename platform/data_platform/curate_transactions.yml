@@ -1,0 +1,23 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: curate_transactions
+display_name: Curate Transactions (Bronze -> Silver)
+description: >-
+  SHARED, PLATFORM-LEVEL component. Cleans raw order-line transactions
+  into a curated table: drops cancellations, nulls, and invalid
+  rows, computes line-level revenue. Contains NO model-specific logic —
+  every model that needs order history (churn, NBA, lead scoring)
+  reuses this exact component unchanged.
+version: 1
+type: command
+inputs:
+  raw_transactions:
+    type: uri_folder
+outputs:
+  curated_orders:
+    type: uri_folder
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python curate_transactions.py
+  --raw_transactions ${{inputs.raw_transactions}}
+  --curated_orders ${{outputs.curated_orders}}

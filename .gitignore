@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+outputs/
+azcopy.zip
+azcopy_windows_amd64_10.32.7/
+data/raw/
+ds_feature_pull/
+validation_data/
+logs1/
+logs2/
+logs3/
+evaluate_logs_*/

@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/azureDataLakeGen2.schema.json
+name: adls_silver
+type: azure_data_lake_gen2
+description: Silver layer — curated, entity-level tables. Written by data_platform/curate_transactions.py. Shared across every model.
+account_name: ecomadlsgen2vt01
+filesystem: silver

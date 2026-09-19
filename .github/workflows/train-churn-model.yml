@@ -1,0 +1,20 @@
+name: train-churn-model
+# FLOW 2 trigger — fires when platform code or this model's config
+# changes. Runs the full retrain pipeline. Use for scheduled retrains
+# or when the platform components themselves change.
+
+on:
+  push:
+    paths:
+      - "mlops/models/churn_model/**"
+      - "platform/components/**"
+      - "mlops/pipelines/train_pipeline.yml"
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  call-reusable-train:
+    uses: ./.github/workflows/reusable-train.yml
+    with:
+      model_name: churn_model
+    secrets: inherit

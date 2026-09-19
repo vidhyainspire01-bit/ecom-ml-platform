@@ -1,0 +1,30 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: train_model
+display_name: Train Model
+description: >-
+  Model-agnostic trainer. model_type selects classifier vs regressor;
+  hyperparameters is a JSON string from the calling model's config, so
+  no model-specific tuning logic lives in this file.
+version: 1
+type: command
+inputs:
+  clean_data:
+    type: uri_folder
+  target_column:
+    type: string
+  model_type:
+    type: string          # "classifier" or "regressor"
+  hyperparameters:
+    type: string           # JSON string, e.g. '{"n_estimators": 200, "max_depth": 6}'
+outputs:
+  model_output:
+    type: mlflow_model
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python train.py
+  --clean_data ${{inputs.clean_data}}
+  --target_column ${{inputs.target_column}}
+  --model_type ${{inputs.model_type}}
+  --hyperparameters '${{inputs.hyperparameters}}'
+  --model_output ${{outputs.model_output}}

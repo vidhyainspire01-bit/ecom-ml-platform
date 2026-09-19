@@ -1,0 +1,33 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: evaluate_model
+display_name: Evaluate Model
+description: >-
+  Computes whichever metric the calling model asks for (accuracy, f1,
+  rmse, ...) and writes a pass/fail gate against a threshold from config.
+  This is what makes champion-challenger comparison possible generically.
+version: 1
+type: command
+inputs:
+  model_input:
+    type: mlflow_model
+  clean_data:
+    type: uri_folder
+  target_column:
+    type: string
+  metric_name:
+    type: string           # "accuracy" | "f1" | "rmse"
+  min_threshold:
+    type: number
+outputs:
+  metrics_output:
+    type: uri_file
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python evaluate.py
+  --model_input ${{inputs.model_input}}
+  --clean_data ${{inputs.clean_data}}
+  --target_column ${{inputs.target_column}}
+  --metric_name ${{inputs.metric_name}}
+  --min_threshold ${{inputs.min_threshold}}
+  --metrics_output ${{outputs.metrics_output}}

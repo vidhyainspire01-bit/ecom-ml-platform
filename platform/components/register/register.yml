@@ -1,0 +1,33 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: register_model
+display_name: Register Model
+description: >-
+  Registers the model into the workspace registry under the naming
+  convention ecom-<model_name>, tagged with git commit SHA and data
+  version for lineage — same script for every model onboarded.
+version: 1
+type: command
+inputs:
+  model_input:
+    type: mlflow_model
+  metrics_input:
+    type: uri_file
+  model_name:
+    type: string
+  git_sha:
+    type: string
+  data_version:
+    type: string
+outputs:
+  registration_info:
+    type: uri_file
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python register.py
+  --model_input ${{inputs.model_input}}
+  --metrics_input ${{inputs.metrics_input}}
+  --model_name ${{inputs.model_name}}
+  --git_sha ${{inputs.git_sha}}
+  --data_version ${{inputs.data_version}}
+  --registration_info ${{outputs.registration_info}}

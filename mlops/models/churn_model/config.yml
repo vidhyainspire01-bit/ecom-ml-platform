@@ -1,0 +1,8 @@
+model_name: churn_model
+raw_data_path: azureml:churn-raw-data@latest
+features: "order_count,avg_order_value,days_since_signup"
+target_column: churned
+model_type: classifier
+hyperparameters: '{"n_estimators": 200, "max_depth": 6}'
+metric_name: accuracy
+min_threshold: 0.75

@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/azureDataLakeGen2.schema.json
+name: adls_raw
+type: azure_data_lake_gen2
+description: Bronze layer — raw, untouched source files. Landed by data engineering, never edited in place.
+account_name: ecomadlsgen2vt01
+filesystem: raw

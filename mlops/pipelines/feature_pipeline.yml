@@ -1,0 +1,45 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+display_name: churn-feature-pipeline
+description: >-
+  Bronze -> Silver -> Gold for the churn model, writing to FIXED, NAMED
+  paths in ADLS Gen2 rather than auto-generated per-job folders. This is
+  what makes the silver table and feature group actually discoverable
+  and reusable by name, not just an artifact buried in one run's outputs.
+
+inputs:
+  raw_transactions:
+    type: uri_folder
+    path: azureml://datastores/adls_raw/paths/
+  churn_window_days: 90
+
+outputs:
+  curated_orders:
+    type: uri_folder
+    path: azureml://datastores/adls_silver/paths/orders/
+    mode: rw_mount
+  churn_features:
+    type: uri_folder
+    path: azureml://datastores/adls_feature_store/paths/churn/customer_rfm_v1/
+    mode: rw_mount
+
+settings:
+  default_compute: azureml:cpu-cluster
+
+jobs:
+  curate_step:
+    type: command
+    component: ../../platform/data_platform/curate_transactions.yml   # SHARED
+    inputs:
+      raw_transactions: ${{parent.inputs.raw_transactions}}
+    outputs:
+      curated_orders: ${{parent.outputs.curated_orders}}
+
+  build_features_step:
+    type: command
+    component: ../../platform/feature_components/churn/build_features.yml   # MODEL-SPECIFIC
+    inputs:
+      curated_orders: ${{parent.jobs.curate_step.outputs.curated_orders}}
+      churn_window_days: ${{parent.inputs.churn_window_days}}
+    outputs:
+      churn_features: ${{parent.outputs.churn_features}}

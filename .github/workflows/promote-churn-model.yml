@@ -1,0 +1,25 @@
+name: promote-churn-model
+# FLOW 1 trigger — fires ONLY when promotion_config.yml changes, i.e. when
+# generate_config_from_run.py has just recorded a new DS handoff.
+# Does not react to platform/components changes at all — that's
+# Flow 2's trigger, a deliberately separate concern.
+
+on:
+  push:
+    paths:
+      - "mlops/models/churn_model/promotion_config.yml"
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_stage:
+        type: choice
+        options: [staging, production]
+        default: staging
+
+jobs:
+  call-reusable-promote:
+    uses: ./.github/workflows/reusable-promote.yml
+    with:
+      model_name: churn_model
+      target_stage: ${{ inputs.target_stage || 'staging' }}
+    secrets: inherit
