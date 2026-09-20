@@ -11,3 +11,4 @@ logs1/
 logs2/
 logs3/
 evaluate_logs_*/
+mlops/deployment/_rendered_*.yml

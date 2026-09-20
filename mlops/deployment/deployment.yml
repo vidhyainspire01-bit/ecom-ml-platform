@@ -4,7 +4,7 @@ endpoint_name: PLACEHOLDER_ENDPOINT_NAME
 model: azureml:PLACEHOLDER_MODEL_NAME:PLACEHOLDER_MODEL_VERSION
 environment: azureml:churn-inference-env@latest
 code_configuration:
-  code: ../scoring
+  code: scoring
   scoring_script: PLACEHOLDER_PLATFORM_MODEL_NAME/main.py
 instance_type: Standard_E2s_v3
 instance_count: 1
