@@ -86,8 +86,10 @@ def main():
     parser.add_argument("--registered_model_name", required=True, help="What DS registered it as, e.g. ecom-churn_model")
     parser.add_argument("--metric_name", default="roc_auc")
     parser.add_argument("--min_threshold", type=float, required=True)
-    parser.add_argument("--features", default="recency_days,order_count,avg_order_value,days_since_signup")
-    parser.add_argument("--target_column", default="churned")
+    parser.add_argument("--features", required=True,
+                         help="Comma-separated, model-specific -- no default, not silently use another model's features")
+    parser.add_argument("--target_column", required=True,
+                         help="Model-specific label column -- no default")
     parser.add_argument("--model_type", default="classifier")
     parser.add_argument("--out_dir", default="mlops/models")
     args = parser.parse_args()

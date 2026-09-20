@@ -19,16 +19,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--feature_data", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--target_column", default="churned",
+                         help="Model-agnostic: pass the correct label column, e.g. 'high_frequency' for lead scoring")
     parser.add_argument("--validation_fraction", type=float, default=0.25)
     args = parser.parse_args()
 
     df = pd.read_csv(args.feature_data)
     _, val_df = train_test_split(
-        df, test_size=args.validation_fraction, random_state=99,  # different seed than DS's split
-        stratify=df["churned"],
+        df, test_size=args.validation_fraction, random_state=99,
+        stratify=df[args.target_column],
     )
     val_df.to_csv(args.output, index=False)
-    print(f"Wrote {len(val_df)} held-out rows -> {args.output}, churn rate {val_df['churned'].mean():.2%}")
+    print(f"Wrote {len(val_df)} held-out rows -> {args.output}, "
+          f"{args.target_column} positive rate {val_df[args.target_column].mean():.2%}")
 
 
 if __name__ == "__main__":

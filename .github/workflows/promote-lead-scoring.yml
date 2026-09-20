@@ -1,0 +1,23 @@
+name: promote-lead-scoring
+on:
+  push:
+    paths:
+      - "mlops/models/high_frequency_lead/promotion_config.yml"
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_stage:
+        type: choice
+        options: [staging, production]
+        default: staging
+
+jobs:
+  call-reusable-promote:
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/reusable-promote.yml
+    with:
+      model_name: high_frequency_lead
+      target_stage: ${{ inputs.target_stage || 'staging' }}
+    secrets: inherit

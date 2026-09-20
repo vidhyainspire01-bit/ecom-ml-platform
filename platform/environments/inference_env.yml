@@ -1,0 +1,6 @@
+$schema: https://azuremlschemas.azureedge.net/latest/environment.schema.json
+name: churn-inference-env
+version: 1
+description: Dedicated SERVING environment, separate from training.
+image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04
+conda_file: inference_conda.yml

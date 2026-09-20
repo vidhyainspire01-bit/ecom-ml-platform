@@ -1,0 +1,19 @@
+name: train-lead-scoring
+on:
+  push:
+    paths:
+      - "mlops/models/high_frequency_lead/config.yml"
+      - "platform/components/**"
+      - "mlops/pipelines/train_pipeline.yml"
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  call-reusable-train:
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/reusable-train.yml
+    with:
+      model_name: high_frequency_lead
+    secrets: inherit

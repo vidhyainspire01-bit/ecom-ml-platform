@@ -1,0 +1,8 @@
+model_name: high_frequency_lead
+raw_data_path: azureml:lead-scoring-features@latest
+features: "recency_days,avg_order_value,days_since_signup,avg_quantity_per_order"
+target_column: high_frequency
+model_type: classifier
+hyperparameters: '{"n_estimators": 200, "max_depth": 6}'
+metric_name: roc_auc
+min_threshold: 0.80

@@ -1,7 +1,7 @@
 model_name: churn_model
-mlflow_run_id: 4d34fa58-f89c-487f-b543-ba1f8dd6900d
+mlflow_run_id: f5a98ac4-937a-4942-8936-f2312f19db3d
 registered_model_name: ecom-churn_model
-registered_model_version: '7'
+registered_model_version: '10'
 features: order_count,avg_order_value,days_since_signup
 target_column: churned
 model_type: classifier

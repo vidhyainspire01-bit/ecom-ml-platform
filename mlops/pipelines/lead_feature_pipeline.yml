@@ -1,0 +1,30 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+display_name: lead-scoring-feature-pipeline
+description: >-
+  Silver -> Gold ONLY for high_frequency_lead. No curate_step here --
+  the silver table is computed ONCE and READ by every model afterward.
+
+inputs:
+  curated_orders:
+    type: uri_folder
+    path: azureml://datastores/adls_silver/paths/orders/
+    mode: ro_mount
+
+outputs:
+  lead_features:
+    type: uri_folder
+    path: azureml://datastores/adls_feature_store/paths/high_frequency_lead/customer_frequency_v1/
+    mode: upload
+
+settings:
+  default_compute: azureml:cpu-cluster
+
+jobs:
+  build_features_step:
+    type: command
+    component: ../../platform/feature_components/high_frequency_lead/build_features.yml
+    inputs:
+      curated_orders: ${{parent.inputs.curated_orders}}
+    outputs:
+      lead_features: ${{parent.outputs.lead_features}}

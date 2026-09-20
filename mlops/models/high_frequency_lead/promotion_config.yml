@@ -1,0 +1,11 @@
+model_name: high_frequency_lead
+mlflow_run_id: e023b6bb-ca77-4e61-9b8d-b6084eaafb35
+registered_model_name: ecom-high_frequency_lead
+registered_model_version: '1'
+features: recency_days,avg_order_value,days_since_signup,avg_quantity_per_order
+target_column: high_frequency
+model_type: classifier
+hyperparameters: '{"n_estimators": 200, "max_depth": 6}'
+metric_name: roc_auc
+min_threshold: 0.8
+observed_metric_at_handoff: 0.904167970243682

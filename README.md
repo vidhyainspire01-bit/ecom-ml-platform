@@ -97,3 +97,37 @@ az role assignment list --assignee 25de3425-94f7-4579-be10-a14b6a95b401 --scope 
 
 
 az role assignment create --assignee 25de3425-94f7-4579-be10-a14b6a95b401 --role "Storage Blob Data Contributor" --scope "/subscriptions/345f72c2-10bd-4dbf-95ab-4cd43df6adb7/resourceGroups/ecom-mlops-rg/providers/Microsoft.Storage/storageAccounts/ecomadlsgen2vt01"
+
+
+
+
+
+extract feild from run id 
+
+python mlops\generate_config_from_run.py --run_id dd7f021d-4389-4b0a-8979-48202ba26091   --model_name churn_model --registered_model_name ecom-churn_model --metric_name roc_auc --min_threshold 0.80 --features "order_count,avg_order_value,days_since_signup"
+
+az ml online-endpoint delete --name churn-staging --yes
+
+
+post deployment logs:
+az ml online-deployment get-logs --name blue --endpoint-name churn-staging --lines 100
+
+re craete endpoint 
+az ml online-endpoint create --name churn-staging --auth-mode key
+
+deploy:
+az ml online-deployment create -f deploy-blue.yml --all-traffic
+
+
+az ml environment create -f platform/environments/inference_env.yml
+
+
+Now actually test it — send a real prediction request
+
+This is the moment to confirm the whole thing works end to end, not just "container started." Get the endpoint's key first:
+
+az ml online-endpoint get-credentials --name churn-staging --query primaryKey -o tsv
+
+
+
+curl -X POST https://churn-staging.eastus.inference.ml.azure.com/score -H "Authorization: Bearer <key>" -H "Content-Type: application/json" -d "{\"data\": [[3, 100.0, 200]], \"columns\": [\"order_count\", \"avg_order_value\", \"days_since_signup\"]}"

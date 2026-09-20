@@ -1,0 +1,17 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: high_frequency_lead_build_features
+display_name: Build High-Frequency Lead Features (Silver -> Gold)
+version: 1
+type: command
+inputs:
+  curated_orders:
+    type: uri_folder
+outputs:
+  lead_features:
+    type: uri_folder
+code: .
+environment: azureml:shared-sklearn-env@latest
+command: >-
+  python build_features.py
+  --curated_orders ${{inputs.curated_orders}}
+  --lead_features ${{outputs.lead_features}}

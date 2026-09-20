@@ -1,12 +1,7 @@
 """
-DS-SIDE — simulates a data scientist's Azure ML notebook.
-
-Deliberately does NOT touch raw transactions or curation logic anymore.
-DS's job starts at the feature store: pull a named, versioned feature
-table, train, register. No RFM math lives here — that's platform code
-DS never re-derives. This is what "onboarding a new use case" looks
-like once the feature store exists: DS's entire input is one data
-asset reference.
+DS-SIDE — second model, same pattern as churn_model_exploration.py.
+Pulls a versioned feature table, trains, registers. Proves the DS
+handoff pattern itself is reusable, not just the platform components.
 """
 import argparse
 import pandas as pd
@@ -19,14 +14,15 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 
 N_ESTIMATORS = 200
 MAX_DEPTH = 6
+FEATURE_COLUMNS = ["recency_days", "avg_order_value", "days_since_signup", "avg_quantity_per_order"]
 
 
-def train_and_register(features_df, feature_asset_ref, model_name="ecom-churn_model",
-                        experiment_name="customer_churn_exploration"):
+def train_and_register(features_df, feature_asset_ref, model_name="ecom-high_frequency_lead",
+                        experiment_name="lead_scoring_exploration"):
     mlflow.set_experiment(experiment_name)
 
-    X = features_df[["order_count", "avg_order_value", "days_since_signup"]]
-    y = features_df["churned"]
+    X = features_df[FEATURE_COLUMNS]
+    y = features_df["high_frequency"]
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     with mlflow.start_run() as run:
@@ -67,12 +63,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--feature_data", type=str, required=True)
     parser.add_argument("--feature_asset_ref", type=str, required=True)
-    parser.add_argument("--model_name", type=str, default="ecom-churn_model")
+    parser.add_argument("--model_name", type=str, default="ecom-high_frequency_lead")
     args = parser.parse_args()
 
     features = pd.read_csv(args.feature_data)
     print(f"Loaded {len(features)} customers from {args.feature_asset_ref}, "
-          f"churn rate {features['churned'].mean():.2%}")
+          f"high-frequency rate {features['high_frequency'].mean():.2%}")
     train_and_register(features, args.feature_asset_ref, model_name=args.model_name)
 
 
