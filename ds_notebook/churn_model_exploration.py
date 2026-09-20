@@ -48,6 +48,13 @@ def train_and_register(features_df, feature_asset_ref, model_name="ecom-churn_mo
         model_info = mlflow.sklearn.log_model(
             model, "model", signature=signature, input_example=X_train.head(3),
             serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_PICKLE,
+            pip_requirements=[
+                "setuptools<81",
+                "mlflow==2.14.1",
+                "mlflow-skinny==2.14.1",
+                "scikit-learn==1.4.2",
+                "pandas==2.2.2",
+            ],
         )
 
         result = mlflow.register_model(model_uri=model_info.model_uri, name=model_name)

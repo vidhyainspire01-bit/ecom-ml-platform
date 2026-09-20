@@ -28,6 +28,13 @@ def main():
     model_info = mlflow.sklearn.log_model(
         model, "model",
         serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_PICKLE,
+        pip_requirements=[
+            "setuptools<81",
+            "mlflow==2.14.1",
+            "mlflow-skinny==2.14.1",
+            "scikit-learn==1.4.2",
+            "pandas==2.2.2",
+        ],
     )
 
     result = mlflow.register_model(
