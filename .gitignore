@@ -11,4 +11,7 @@ logs1/
 logs2/
 logs3/
 evaluate_logs_*/
-mlops/deployment/_rendered_*.yml
+mlops/deployment/_rendered_*.ymlfederated-credential*.json 
+deploy-blue.yml 
+lead_features.csv 
+lead_validation.csv 
