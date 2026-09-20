@@ -41,4 +41,21 @@ fi
 az ml online-deployment create -f mlops/deployment/_rendered_deployment.yml --all-traffic
 
 echo "Deployed. Endpoint scoring URI:"
-az ml online-endpoint show --name "$ENDPOINT_NAME" --query scoring_uri -o tsv
+SCORING_URI=$(az ml online-endpoint show --name "$ENDPOINT_NAME" --query scoring_uri -o tsv)
+echo "$SCORING_URI"
+
+FEATURES=$(python -c "import yaml; print(yaml.safe_load(open('mlops/models/${PLATFORM_MODEL_NAME}/promotion_config.yml'))['features'])")
+SAMPLE_ROW=$(python3 -c "
+import csv
+features = '${FEATURES}'.split(',')
+with open('validation_data/validation.csv') as f:
+    row = next(csv.DictReader(f))
+    print(','.join(row[c] for c in features))
+")
+API_KEY=$(az ml online-endpoint get-credentials --name "$ENDPOINT_NAME" --query primaryKey -o tsv)
+
+python mlops/scripts/smoke_test_endpoint.py \
+  --scoring_uri "$SCORING_URI" \
+  --api_key "$API_KEY" \
+  --features "$FEATURES" \
+  --sample_values "$SAMPLE_ROW"
