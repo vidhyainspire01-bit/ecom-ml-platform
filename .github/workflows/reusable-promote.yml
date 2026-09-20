@@ -1,7 +1,7 @@
 name: reusable-promote
 # FLOW 1 — DS handoff promotion. NO training happens here. Loads the
 # model DS already registered, re-scores it independently, re-tags
-# the stage if it passes. This is the workflow that was missing.
+# the stage if it passes.
 
 on:
   workflow_call:
@@ -44,7 +44,7 @@ jobs:
           az storage blob download \
             --account-name ecommlopstorageaaf1d8da7 \
             --container-name azureml-blobstore-fd2efc89-0d50-4333-801f-e697c5bdd4b7 \
-            --name "LocalUpload/d92ae18288f41c0b1b9579b2f2ac9eda539913e6b6e51df8373716e4480735af/validation_data/validation.csv" \
+            --name "validation-sets/${{ inputs.model_name }}/validation.csv" \
             --file validation_data/validation.csv \
             --auth-mode login
       - name: Show what actually got downloaded
@@ -54,10 +54,9 @@ jobs:
             --model_name "${{ inputs.model_name }}" \
             --validation_data "$(find validation_data -name '*.csv' | head -1)" \
             --target_stage "${{ inputs.target_stage }}"
-
       - name: Deploy the just-promoted model version to the target endpoint
         run: |
           MODEL_NAME=$(python -c "import yaml; print(yaml.safe_load(open('mlops/models/${{ inputs.model_name }}/promotion_config.yml'))['registered_model_name'])")
           MODEL_VERSION=$(python -c "import yaml; print(yaml.safe_load(open('mlops/models/${{ inputs.model_name }}/promotion_config.yml'))['registered_model_version'])")
           chmod +x mlops/scripts/deploy_model.sh
-          ./mlops/scripts/deploy_model.sh "${{ inputs.target_stage }}" "$MODEL_NAME" "$MODEL_VERSION"      
+          ./mlops/scripts/deploy_model.sh "${{ inputs.target_stage }}" "$MODEL_NAME" "$MODEL_VERSION" "${{ inputs.model_name }}"

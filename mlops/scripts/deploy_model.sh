@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Usage: deploy_model.sh <target_stage> <registered_model_name> <model_version>
+# Usage: deploy_model.sh <target_stage> <registered_model_name> <model_version> <platform_model_name>
 set -euo pipefail
 
 TARGET_STAGE="$1"
 MODEL_NAME="$2"
 MODEL_VERSION="$3"
+PLATFORM_MODEL_NAME="$4"
 
-ENDPOINT_NAME="churn-${TARGET_STAGE}"
+ENDPOINT_SLUG=$(echo "$PLATFORM_MODEL_NAME" | tr '_' '-' | tr '[:upper:]' '[:lower:]')
+ENDPOINT_NAME="${ENDPOINT_SLUG}-${TARGET_STAGE}"
 DEPLOYMENT_NAME="blue"
 
 echo "Deploying ${MODEL_NAME}:${MODEL_VERSION} to endpoint '${ENDPOINT_NAME}', deployment '${DEPLOYMENT_NAME}'"
@@ -24,6 +26,7 @@ sed \
   -e "s/PLACEHOLDER_ENDPOINT_NAME/${ENDPOINT_NAME}/" \
   -e "s/PLACEHOLDER_MODEL_NAME/${MODEL_NAME}/" \
   -e "s/PLACEHOLDER_MODEL_VERSION/${MODEL_VERSION}/" \
+  -e "s/PLACEHOLDER_PLATFORM_MODEL_NAME/${PLATFORM_MODEL_NAME}/" \
   mlops/deployment/deployment.yml > /tmp/deployment.yml
 
 if az ml online-deployment show --name "$DEPLOYMENT_NAME" --endpoint-name "$ENDPOINT_NAME" >/dev/null 2>&1; then
