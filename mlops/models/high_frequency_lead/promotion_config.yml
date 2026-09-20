@@ -1,7 +1,7 @@
 model_name: high_frequency_lead
-mlflow_run_id: e023b6bb-ca77-4e61-9b8d-b6084eaafb35
+mlflow_run_id: 3ab421dc-7732-45c5-9b75-b1453e20306c
 registered_model_name: ecom-high_frequency_lead
-registered_model_version: '1'
+registered_model_version: '3'
 features: recency_days,avg_order_value,days_since_signup,avg_quantity_per_order
 target_column: high_frequency
 model_type: classifier
