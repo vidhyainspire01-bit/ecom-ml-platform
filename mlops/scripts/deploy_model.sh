@@ -21,14 +21,18 @@ else
   echo "Endpoint ${ENDPOINT_NAME} already exists, reusing it."
 fi
 
+SCORING_ABS_PATH="$(pwd)/mlops/deployment/scoring"
+
 sed \
   -e "s/PLACEHOLDER_DEPLOYMENT_NAME/${DEPLOYMENT_NAME}/" \
   -e "s/PLACEHOLDER_ENDPOINT_NAME/${ENDPOINT_NAME}/" \
   -e "s/PLACEHOLDER_MODEL_NAME/${MODEL_NAME}/" \
   -e "s/PLACEHOLDER_MODEL_VERSION/${MODEL_VERSION}/" \
   -e "s/PLACEHOLDER_PLATFORM_MODEL_NAME/${PLATFORM_MODEL_NAME}/" \
-  mlops/deployment/deployment.yml > /tmp/deployment.yml
+  -e "s|PLACEHOLDER_ABSOLUTE_CODE_PATH|${SCORING_ABS_PATH}|" \
+  mlops/deployment/deployment.yml > mlops/deployment/_rendered_deployment.yml
 
+  
 if az ml online-deployment show --name "$DEPLOYMENT_NAME" --endpoint-name "$ENDPOINT_NAME" >/dev/null 2>&1; then
   echo "Deployment ${DEPLOYMENT_NAME} already exists -- deleting and recreating (brief downtime, no blue/green yet)"
   az ml online-deployment delete --name "$DEPLOYMENT_NAME" --endpoint-name "$ENDPOINT_NAME" --yes
