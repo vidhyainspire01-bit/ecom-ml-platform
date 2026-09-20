@@ -1,0 +1,8 @@
+
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
+name: PLACEHOLDER_ENDPOINT_NAME
+auth_mode: key
+description: >-
+  Model-agnostic endpoint template. Name is set at deploy time via
+  --set, one endpoint per environment (staging/production), shared
+  across whichever model version currently holds 100% traffic there.

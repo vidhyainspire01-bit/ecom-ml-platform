@@ -54,3 +54,10 @@ jobs:
             --model_name "${{ inputs.model_name }}" \
             --validation_data "$(find validation_data -name '*.csv' | head -1)" \
             --target_stage "${{ inputs.target_stage }}"
+
+      - name: Deploy the just-promoted model version to the target endpoint
+        run: |
+          MODEL_NAME=$(python -c "import yaml; print(yaml.safe_load(open('mlops/models/${{ inputs.model_name }}/promotion_config.yml'))['registered_model_name'])")
+          MODEL_VERSION=$(python -c "import yaml; print(yaml.safe_load(open('mlops/models/${{ inputs.model_name }}/promotion_config.yml'))['registered_model_version'])")
+          chmod +x mlops/scripts/deploy_model.sh
+          ./mlops/scripts/deploy_model.sh "${{ inputs.target_stage }}" "$MODEL_NAME" "$MODEL_VERSION"      
