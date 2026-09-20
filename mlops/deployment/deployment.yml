@@ -2,5 +2,5 @@ $schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.sch
 name: PLACEHOLDER_DEPLOYMENT_NAME
 endpoint_name: PLACEHOLDER_ENDPOINT_NAME
 model: azureml:PLACEHOLDER_MODEL_NAME:PLACEHOLDER_MODEL_VERSION
-instance_type: Standard_DS2_v2
+instance_type: Standard_DS3_v2
 instance_count: 1
